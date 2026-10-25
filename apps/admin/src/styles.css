@@ -567,3 +567,38 @@ a.stat:hover {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+/* Language switcher (Thai / English) */
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.lang-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border: 0;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+.lang-btn + .lang-btn {
+  border-left: 1px solid var(--border);
+}
+.lang-btn.active {
+  background: var(--primary);
+  color: var(--primary-text);
+}
+.lang-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.login-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}

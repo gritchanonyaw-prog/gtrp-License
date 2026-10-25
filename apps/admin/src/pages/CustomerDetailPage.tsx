@@ -8,6 +8,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import { useAsync } from "../hooks/useAsync";
 import { api } from "../services/api";
 import { fmtDate, fmtMoney } from "../services/format";
+import { t } from "../i18n";
 
 export function CustomerDetailPage() {
   const { id = "" } = useParams();
@@ -27,29 +28,29 @@ export function CustomerDetailPage() {
       <div className="page-head">
         <div>
           <p className="muted small">
-            <Link to="/customers">Customers</Link> /
+            <Link to="/customers">{t("Customers")}</Link> /
           </p>
           <h1>{c.email}</h1>
           <p className="muted small">
-            ID <code>{c.id}</code> · joined {fmtDate(c.created_at)} · <StatusBadge status={c.status} />
+            {t("ID")} <code>{c.id}</code> · {t("joined {date}", { date: fmtDate(c.created_at) })} · <StatusBadge status={c.status} />
           </p>
         </div>
         {c.status !== "deleted" && (
           <div className="actions">
             <button type="button" className="btn btn-primary" onClick={() => setDialog("license")}>
-              New license
+              {t("New license")}
             </button>
             {c.status === "active" ? (
               <button type="button" className="btn btn-warn" onClick={() => setDialog("suspend")}>
-                Suspend account
+                {t("Suspend account")}
               </button>
             ) : (
               <button type="button" className="btn" onClick={() => setDialog("activate")}>
-                Reactivate account
+                {t("Reactivate account")}
               </button>
             )}
             <button type="button" className="btn btn-danger" onClick={() => setDialog("delete")}>
-              Delete account
+              {t("Delete account")}
             </button>
           </div>
         )}
@@ -60,19 +61,19 @@ export function CustomerDetailPage() {
         </Alert>
       )}
 
-      <h2>Licenses</h2>
+      <h2>{t("Licenses")}</h2>
       {data.licenses.length === 0 ? (
-        <EmptyState>This customer has no licenses.</EmptyState>
+        <EmptyState>{t("This customer has no licenses.")}</EmptyState>
       ) : (
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Plan</th>
-                <th>Status</th>
-                <th>Key</th>
-                <th>Expires</th>
-                <th>Web / EA / Accounts</th>
+                <th>{t("Plan")}</th>
+                <th>{t("Status")}</th>
+                <th>{t("Key")}</th>
+                <th>{t("Expires")}</th>
+                <th>{t("Web / EA / Accounts")}</th>
               </tr>
             </thead>
             <tbody>
@@ -83,10 +84,10 @@ export function CustomerDetailPage() {
                   </td>
                   <td>
                     <StatusBadge status={l.effective_status} />
-                    {l.in_grace && <StatusBadge status="expired" label="grace" />}
+                    {l.in_grace && <StatusBadge status="expired" label={t("grace")} />}
                   </td>
                   <td>
-                    <code>{l.key_hint ?? "not issued"}</code>
+                    <code>{l.key_hint ?? t("not issued")}</code>
                   </td>
                   <td>{fmtDate(l.expires_at)}</td>
                   <td>
@@ -99,19 +100,19 @@ export function CustomerDetailPage() {
         </div>
       )}
 
-      <h2>Payments and renewals</h2>
+      <h2>{t("Payments and renewals")}</h2>
       {data.payments.length === 0 ? (
-        <EmptyState>No payments recorded.</EmptyState>
+        <EmptyState>{t("No payments recorded.")}</EmptyState>
       ) : (
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Created</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Paid</th>
-                <th>Provider ref</th>
+                <th>{t("Created")}</th>
+                <th>{t("Amount")}</th>
+                <th>{t("Status")}</th>
+                <th>{t("Paid")}</th>
+                <th>{t("Provider ref")}</th>
               </tr>
             </thead>
             <tbody>
@@ -135,7 +136,7 @@ export function CustomerDetailPage() {
         </div>
       )}
       <p>
-        <Link to={`/audit?target_user_id=${c.id}`}>View this customer’s audit history</Link>
+        <Link to={`/audit?target_user_id=${c.id}`}>{t("View this customer’s audit history")}</Link>
       </p>
 
       {dialog === "license" && (
@@ -152,17 +153,17 @@ export function CustomerDetailPage() {
       {newKey && <KeyReveal licenseKey={newKey} onClose={() => setNewKey(null)} />}
       {(dialog === "suspend" || dialog === "activate") && (
         <ConfirmDialog
-          title={dialog === "suspend" ? "Suspend this account?" : "Reactivate this account?"}
+          title={dialog === "suspend" ? t("Suspend this account?") : t("Reactivate this account?")}
           message={
             dialog === "suspend"
-              ? "The customer is signed out everywhere and all of their licenses stop working until the account is reactivated."
-              : "The customer can sign in again and their licenses work according to their own status."
+              ? t("The customer is signed out everywhere and all of their licenses stop working until the account is reactivated.")
+              : t("The customer can sign in again and their licenses work according to their own status.")
           }
-          confirmLabel={dialog === "suspend" ? "Suspend account" : "Reactivate"}
+          confirmLabel={dialog === "suspend" ? t("Suspend account") : t("Reactivate")}
           danger={dialog === "suspend"}
           onConfirm={async (reason) => {
             await api.setCustomerStatus(c.id, dialog === "suspend" ? "suspended" : "active", reason);
-            setNotice(dialog === "suspend" ? "Account suspended." : "Account reactivated.");
+            setNotice(dialog === "suspend" ? t("Account suspended.") : t("Account reactivated."));
             reload();
           }}
           onClose={() => setDialog(null)}
@@ -170,16 +171,16 @@ export function CustomerDetailPage() {
       )}
       {dialog === "delete" && (
         <ConfirmDialog
-          title="Delete this account permanently?"
+          title={t("Delete this account permanently?")}
           message={
             <>
-              <p>The email and password are erased, all licenses are revoked, and all devices are deactivated. Payment records and the audit log are kept for legal retention.</p>
+              <p>{t("The email and password are erased, all licenses are revoked, and all devices are deactivated. Payment records and the audit log are kept for legal retention.")}</p>
               <p>
-                <strong>This cannot be undone.</strong>
+                <strong>{t("This cannot be undone.")}</strong>
               </p>
             </>
           }
-          confirmLabel="Delete account"
+          confirmLabel={t("Delete account")}
           danger
           onConfirm={async (reason) => {
             await api.deleteCustomer(c.id, reason);

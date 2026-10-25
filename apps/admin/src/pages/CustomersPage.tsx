@@ -7,6 +7,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useQueryState } from "../hooks/useQueryState";
 import { api } from "../services/api";
 import { fmtDate } from "../services/format";
+import { t } from "../i18n";
 
 export function CustomersPage() {
   const { values, page, set } = useQueryState(["q", "status"] as const);
@@ -21,24 +22,24 @@ export function CustomersPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Customers</h1>
+        <h1>{t("Customers")}</h1>
       </div>
       <form className="filters" onSubmit={search} role="search">
         <label className="field inline">
-          <span>Email or user ID</span>
+          <span>{t("Email or user ID")}</span>
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="name@example.com" />
         </label>
         <label className="field inline">
-          <span>Status</span>
+          <span>{t("Status")}</span>
           <select value={values.status} onChange={(e) => set({ status: e.target.value })}>
-            <option value="">All</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-            <option value="deleted">Deleted</option>
+            <option value="">{t("All")}</option>
+            <option value="active">{t("Active")}</option>
+            <option value="suspended">{t("Suspended")}</option>
+            <option value="deleted">{t("Deleted")}</option>
           </select>
         </label>
         <button type="submit" className="btn">
-          Search
+          {t("Search")}
         </button>
       </form>
       {loading && <Loading />}
@@ -46,16 +47,16 @@ export function CustomersPage() {
       {data && !loading && (
         <>
           {data.data.length === 0 ? (
-            <EmptyState>No customers match these filters.</EmptyState>
+            <EmptyState>{t("No customers match these filters.")}</EmptyState>
           ) : (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Licenses</th>
-                    <th>Joined</th>
+                    <th>{t("Email")}</th>
+                    <th>{t("Status")}</th>
+                    <th>{t("Licenses")}</th>
+                    <th>{t("Joined")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -68,7 +69,7 @@ export function CustomersPage() {
                         <StatusBadge status={c.status} />
                       </td>
                       <td>
-                        {c.active_license_count} active / {c.license_count}
+                        {t("{active} active / {total}", { active: c.active_license_count, total: c.license_count })}
                       </td>
                       <td>{fmtDate(c.created_at)}</td>
                     </tr>

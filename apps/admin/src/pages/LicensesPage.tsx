@@ -9,6 +9,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useQueryState } from "../hooks/useQueryState";
 import { api } from "../services/api";
 import { fmtDate } from "../services/format";
+import { t } from "../i18n";
 
 export function LicensesPage() {
   const { values, page, set } = useQueryState(["status", "plan_id", "email", "expiring_within_days"] as const);
@@ -25,9 +26,9 @@ export function LicensesPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Licenses</h1>
+        <h1>{t("Licenses")}</h1>
         <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-          Create license
+          {t("Create license")}
         </button>
       </div>
       <form
@@ -39,24 +40,24 @@ export function LicensesPage() {
         }}
       >
         <label className="field inline">
-          <span>Customer email</span>
+          <span>{t("Customer email")}</span>
           <input type="search" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label className="field inline">
-          <span>Status</span>
+          <span>{t("Status")}</span>
           <select value={values.status} onChange={(e) => set({ status: e.target.value, expiring_within_days: "" })}>
-            <option value="">All</option>
+            <option value="">{t("All")}</option>
             {["created", "active", "expired", "suspended", "revoked"].map((s) => (
               <option key={s} value={s}>
-                {s}
+                {t(s)}
               </option>
             ))}
           </select>
         </label>
         <label className="field inline">
-          <span>Plan</span>
+          <span>{t("Plan")}</span>
           <select value={values.plan_id} onChange={(e) => set({ plan_id: e.target.value })}>
-            <option value="">All</option>
+            <option value="">{t("All")}</option>
             {plans.data?.data.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -65,15 +66,15 @@ export function LicensesPage() {
           </select>
         </label>
         <label className="field inline">
-          <span>Expiring</span>
+          <span>{t("Expiring")}</span>
           <select value={values.expiring_within_days} onChange={(e) => set({ expiring_within_days: e.target.value, status: "" })}>
-            <option value="">Any time</option>
-            <option value="7">Within 7 days</option>
-            <option value="30">Within 30 days</option>
+            <option value="">{t("Any time")}</option>
+            <option value="7">{t("Within 7 days")}</option>
+            <option value="30">{t("Within 30 days")}</option>
           </select>
         </label>
         <button type="submit" className="btn">
-          Search
+          {t("Search")}
         </button>
       </form>
       {loading && <Loading />}
@@ -81,18 +82,18 @@ export function LicensesPage() {
       {data && !loading && (
         <>
           {data.data.length === 0 ? (
-            <EmptyState>No licenses match these filters.</EmptyState>
+            <EmptyState>{t("No licenses match these filters.")}</EmptyState>
           ) : (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Customer</th>
-                    <th>Plan</th>
-                    <th>Status</th>
-                    <th>Key</th>
-                    <th>Starts</th>
-                    <th>Expires</th>
+                    <th>{t("Customer")}</th>
+                    <th>{t("Plan")}</th>
+                    <th>{t("Status")}</th>
+                    <th>{t("Key")}</th>
+                    <th>{t("Starts")}</th>
+                    <th>{t("Expires")}</th>
                   </tr>
                 </thead>
                 <tbody>

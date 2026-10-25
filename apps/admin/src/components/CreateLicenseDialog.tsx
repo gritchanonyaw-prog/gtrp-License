@@ -5,6 +5,7 @@ import { fmtMoney, localInputToIso } from "../services/format";
 import { Field, fieldErrors } from "./Field";
 import { Modal } from "./Modal";
 import { ErrorState, Loading, errorMessage } from "./States";
+import { t } from "../i18n";
 
 export function CreateLicenseDialog({ fixedUserId, onClose, onCreated }: { fixedUserId?: string; onClose: () => void; onCreated: (key: string, licenseId: string) => void }) {
   const plans = useAsync(() => api.plans(), []);
@@ -42,59 +43,59 @@ export function CreateLicenseDialog({ fixedUserId, onClose, onCreated }: { fixed
 
   return (
     <Modal
-      title="Create license"
+      title={t("Create license")}
       onClose={busy ? () => {} : onClose}
       footer={
         <>
           <button type="button" className="btn" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="button" className="btn btn-primary" onClick={submit} disabled={busy || !planId || (!fixedUserId && !email) || (expiryMode === "custom" && !expiresAt)}>
-            {busy ? "Creating…" : "Create license"}
+            {busy ? t("Creating…") : t("Create license")}
           </button>
         </>
       }
     >
-      {plans.loading && <Loading label="Loading plans…" />}
+      {plans.loading && <Loading label={t("Loading plans…")} />}
       {plans.error !== null && <ErrorState error={plans.error} onRetry={plans.reload} />}
       {plans.data && (
         <div className="form-grid">
           {!fixedUserId && (
-            <Field label="Customer email" hint="The customer must already have registered an account." error={errs.email ?? errs.user_id}>
+            <Field label={t("Customer email")} hint={t("The customer must already have registered an account.")} error={errs.email ?? errs.user_id}>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </Field>
           )}
-          <Field label="Plan" error={errs.plan_id}>
+          <Field label={t("Plan")} error={errs.plan_id}>
             <select value={planId} onChange={(e) => setPlanId(e.target.value)} required>
-              <option value="">Choose a plan…</option>
+              <option value="">{t("Choose a plan…")}</option>
               {activePlans.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.code}) · {fmtMoney(p.price_minor, p.currency)} / {p.billing_period}
+                  {p.name} ({p.code}) · {fmtMoney(p.price_minor, p.currency)} / {t(p.billing_period)}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Start date" hint="Leave empty to start now." error={errs.starts_at}>
+          <Field label={t("Start date")} hint={t("Leave empty to start now.")} error={errs.starts_at}>
             <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
           </Field>
           <fieldset className="field">
-            <legend>Expiration</legend>
+            <legend>{t("Expiration")}</legend>
             <label className="check">
-              <input type="radio" name="exp" checked={expiryMode === "plan"} onChange={() => setExpiryMode("plan")} /> One billing period from the start (lifetime plans never expire)
+              <input type="radio" name="exp" checked={expiryMode === "plan"} onChange={() => setExpiryMode("plan")} /> {t("One billing period from the start (lifetime plans never expire)")}
             </label>
             <label className="check">
-              <input type="radio" name="exp" checked={expiryMode === "custom"} onChange={() => setExpiryMode("custom")} /> Custom date
+              <input type="radio" name="exp" checked={expiryMode === "custom"} onChange={() => setExpiryMode("custom")} /> {t("Custom date")}
             </label>
-            {expiryMode === "custom" && <input type="datetime-local" aria-label="Expiration date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />}
+            {expiryMode === "custom" && <input type="datetime-local" aria-label={t("Expiration date")} value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />}
             {errs.expires_at && <small className="error-text">{errs.expires_at}</small>}
           </fieldset>
-          <Field label="Grace period (days)" hint="Access continues this many days after expiry." error={errs.grace_days}>
+          <Field label={t("Grace period (days)")} hint={t("Access continues this many days after expiry.")} error={errs.grace_days}>
             <input type="number" min={0} max={60} value={graceDays} onChange={(e) => setGraceDays(Number(e.target.value))} />
           </Field>
           <label className="check">
-            <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} /> Active immediately (untick to create it as “created”, e.g. awaiting payment)
+            <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} /> {t("Active immediately (untick to create it as “created”, e.g. awaiting payment)")}
           </label>
-          <Field label="Internal note (optional)" error={errs.note}>
+          <Field label={t("Internal note (optional)")} error={errs.note}>
             <textarea rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} />
           </Field>
         </div>

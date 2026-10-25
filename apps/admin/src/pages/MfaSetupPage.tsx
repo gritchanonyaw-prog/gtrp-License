@@ -3,6 +3,7 @@ import { Field } from "../components/Field";
 import { ErrorState, Loading, errorMessage } from "../components/States";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
+import { t } from "../i18n";
 
 /** Administrators must enroll TOTP MFA. Skipping is offered only on the development environment. */
 export function MfaSetupPage({ onSkip }: { onSkip: () => void }) {
@@ -24,10 +25,10 @@ export function MfaSetupPage({ onSkip }: { onSkip: () => void }) {
     return (
       <div className="login-wrap">
         <div className="card login">
-          <h1>Sign in again</h1>
-          <p>This session was not verified with MFA. Sign out and sign in with your authentication code.</p>
+          <h1>{t("Sign in again")}</h1>
+          <p>{t("This session was not verified with MFA. Sign out and sign in with your authentication code.")}</p>
           <button type="button" className="btn btn-primary" onClick={() => void logout()}>
-            Sign out
+            {t("Sign out")}
           </button>
         </div>
       </div>
@@ -63,32 +64,32 @@ export function MfaSetupPage({ onSkip }: { onSkip: () => void }) {
   return (
     <div className="login-wrap">
       <div className="card login">
-        <h1>Set up two-factor authentication</h1>
-        <p>Administrator accounts must use an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, etc.).</p>
+        <h1>{t("Set up two-factor authentication")}</h1>
+        <p>{t("Administrator accounts must use an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, etc.).")}</p>
         {!setup && (
           <button type="button" className="btn btn-primary" onClick={start} disabled={busy}>
-            {busy ? <Loading label="Preparing…" /> : "Start setup"}
+            {busy ? <Loading label={t("Preparing…")} /> : t("Start setup")}
           </button>
         )}
         {setup && (
           <form onSubmit={enable}>
-            <p>Add this key in your authenticator app (choose “enter a setup key”, time-based):</p>
+            <p>{t("Add this key in your authenticator app (choose “enter a setup key”, time-based):")}</p>
             <div className="key-box">
               <code>{setup.secret}</code>
             </div>
-            <p className="muted small">Setup link for apps that accept it: <code className="wrap">{setup.otpauth_uri}</code></p>
-            <Field label="6-digit code from the app">
+            <p className="muted small">{t("Setup link for apps that accept it:")} <code className="wrap">{setup.otpauth_uri}</code></p>
+            <Field label={t("6-digit code from the app")}>
               <input inputMode="numeric" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} required />
             </Field>
             <button type="submit" className="btn btn-primary" disabled={busy || code.length !== 6}>
-              Turn on MFA
+              {t("Turn on MFA")}
             </button>
           </form>
         )}
         {error !== null && (setup ? <p className="error-text" role="alert">{errorMessage(error)}</p> : <ErrorState error={error} />)}
         {env === "development" && (
           <button type="button" className="btn-link" onClick={onSkip}>
-            Skip for now (development only)
+            {t("Skip for now (development only)")}
           </button>
         )}
       </div>

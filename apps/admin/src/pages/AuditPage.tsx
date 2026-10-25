@@ -7,6 +7,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useQueryState } from "../hooks/useQueryState";
 import { api } from "../services/api";
 import { fmtDate, localInputToIso, shortId } from "../services/format";
+import { t } from "../i18n";
 
 const KEYS = ["from", "to", "actor_user_id", "target_user_id", "license_id", "event_type"] as const;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -34,62 +35,62 @@ export function AuditPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Audit log</h1>
+        <h1>{t("Audit log")}</h1>
       </div>
       <form className="filters" onSubmit={apply}>
         <label className="field inline">
-          <span>From</span>
+          <span>{t("From")}</span>
           <input type="datetime-local" value={draft.from.replace(/:\d{2}\.\d{3}Z$|Z$/, "")} onChange={(e) => setDraft({ ...draft, from: e.target.value })} />
         </label>
         <label className="field inline">
-          <span>To</span>
+          <span>{t("To")}</span>
           <input type="datetime-local" value={draft.to.replace(/:\d{2}\.\d{3}Z$|Z$/, "")} onChange={(e) => setDraft({ ...draft, to: e.target.value })} />
         </label>
         <label className="field inline">
-          <span>Event type</span>
+          <span>{t("Event type")}</span>
           <select value={draft.event_type} onChange={(e) => setDraft({ ...draft, event_type: e.target.value })}>
-            <option value="">All</option>
-            {AUDIT_EVENT_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            <option value="">{t("All")}</option>
+            {AUDIT_EVENT_TYPES.map((ev) => (
+              <option key={ev} value={ev}>
+                {ev}
               </option>
             ))}
           </select>
         </label>
         <label className="field inline">
-          <span>Administrator ID</span>
+          <span>{t("Administrator ID")}</span>
           <input value={draft.actor_user_id} onChange={(e) => setDraft({ ...draft, actor_user_id: e.target.value })} />
         </label>
         <label className="field inline">
-          <span>Customer ID</span>
+          <span>{t("Customer ID")}</span>
           <input value={draft.target_user_id} onChange={(e) => setDraft({ ...draft, target_user_id: e.target.value })} />
         </label>
         <label className="field inline">
-          <span>License ID</span>
+          <span>{t("License ID")}</span>
           <input value={draft.license_id} onChange={(e) => setDraft({ ...draft, license_id: e.target.value })} />
         </label>
         <button type="submit" className="btn" disabled={!!idError}>
-          Apply filters
+          {t("Apply filters")}
         </button>
-        {idError && <small className="error-text">IDs must be full UUIDs.</small>}
+        {idError && <small className="error-text">{t("IDs must be full UUIDs.")}</small>}
       </form>
       {loading && <Loading />}
       {error !== null && <ErrorState error={error} onRetry={reload} />}
       {data && !loading && (
         <>
           {data.data.length === 0 ? (
-            <EmptyState>No events match these filters.</EmptyState>
+            <EmptyState>{t("No events match these filters.")}</EmptyState>
           ) : (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Time</th>
-                    <th>Event</th>
-                    <th>By</th>
-                    <th>Customer</th>
-                    <th>License</th>
-                    <th>Details</th>
+                    <th>{t("Time")}</th>
+                    <th>{t("Event")}</th>
+                    <th>{t("By")}</th>
+                    <th>{t("Customer")}</th>
+                    <th>{t("License")}</th>
+                    <th>{t("Details")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -104,7 +105,7 @@ export function AuditPage() {
                       <td>{e.license_id ? <Link to={`/licenses/${e.license_id}`}>{shortId(e.license_id)}</Link> : "—"}</td>
                       <td>
                         <details>
-                          <summary>View</summary>
+                          <summary>{t("View")}</summary>
                           <pre className="details-json">{JSON.stringify(e.details, null, 2)}</pre>
                         </details>
                       </td>

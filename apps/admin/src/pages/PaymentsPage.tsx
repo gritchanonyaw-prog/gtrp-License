@@ -6,6 +6,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useQueryState } from "../hooks/useQueryState";
 import { api } from "../services/api";
 import { fmtDate, fmtMoney, shortId } from "../services/format";
+import { t } from "../i18n";
 
 /** Read-only: payment status changes only through verified provider webhooks. */
 export function PaymentsPage() {
@@ -14,17 +15,17 @@ export function PaymentsPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Payments</h1>
+        <h1>{t("Payments")}</h1>
       </div>
-      <p className="muted">Statuses shown here come only from provider webhooks with verified signatures. A customer returning from a checkout page does not mark a payment as paid.</p>
+      <p className="muted">{t("Statuses shown here come only from provider webhooks with verified signatures. A customer returning from a checkout page does not mark a payment as paid.")}</p>
       <div className="filters">
         <label className="field inline">
-          <span>Status</span>
+          <span>{t("Status")}</span>
           <select value={values.status} onChange={(e) => set({ status: e.target.value })}>
-            <option value="">All</option>
+            <option value="">{t("All")}</option>
             {["pending", "paid", "failed", "refunded"].map((s) => (
               <option key={s} value={s}>
-                {s}
+                {t(s)}
               </option>
             ))}
           </select>
@@ -35,20 +36,20 @@ export function PaymentsPage() {
       {data && !loading && (
         <>
           {data.data.length === 0 ? (
-            <EmptyState>No payments yet.</EmptyState>
+            <EmptyState>{t("No payments yet.")}</EmptyState>
           ) : (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Created</th>
-                    <th>Customer</th>
-                    <th>Plan</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Paid</th>
-                    <th>License</th>
-                    <th>Provider</th>
+                    <th>{t("Created")}</th>
+                    <th>{t("Customer")}</th>
+                    <th>{t("Plan")}</th>
+                    <th>{t("Amount")}</th>
+                    <th>{t("Status")}</th>
+                    <th>{t("Paid")}</th>
+                    <th>{t("License")}</th>
+                    <th>{t("Provider")}</th>
                   </tr>
                 </thead>
                 <tbody>

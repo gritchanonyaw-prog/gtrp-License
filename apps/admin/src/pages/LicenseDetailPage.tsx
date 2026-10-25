@@ -12,6 +12,7 @@ import { useAsync } from "../hooks/useAsync";
 import { ApiError, api, type LicenseDetail } from "../services/api";
 import { fmtDate, isoToLocalInput, localInputToIso, shortId } from "../services/format";
 import type { Activation } from "../types";
+import { t } from "../i18n";
 
 type StatusAction = "activate" | "suspend" | "reactivate" | "revoke";
 
@@ -44,14 +45,14 @@ export function LicenseDetailPage() {
       <div className="page-head">
         <div>
           <p className="muted small">
-            <Link to="/licenses">Licenses</Link> / {shortId(l.id)}
+            <Link to="/licenses">{t("Licenses")}</Link> / {shortId(l.id)}
           </p>
           <h1>
-            {l.plan.name} license <StatusBadge status={l.effective_status} /> {l.in_grace && <StatusBadge status="expired" label="in grace period" />}
+            {t("{plan} license", { plan: l.plan.name })} <StatusBadge status={l.effective_status} /> {l.in_grace && <StatusBadge status="expired" label={t("in grace period")} />}
           </h1>
           {l.user && (
             <p>
-              Customer: <Link to={`/customers/${l.user.id}`}>{l.user.email}</Link>
+              {t("Customer:")} <Link to={`/customers/${l.user.id}`}>{l.user.email}</Link>
             </p>
           )}
         </div>
@@ -60,21 +61,21 @@ export function LicenseDetailPage() {
             .filter((a) => actions.includes(a))
             .map((a) => (
               <button key={a} type="button" className={`btn ${ACTION_COPY[a].danger ? (a === "revoke" ? "btn-danger" : "btn-warn") : "btn-primary"}`} onClick={() => setAction(a)}>
-                {ACTION_COPY[a].label}
+                {t(ACTION_COPY[a].label)}
               </button>
             ))}
           {actions.includes("renew") && (
             <button type="button" className="btn" onClick={() => setDialog("renew")}>
-              Renew
+              {t("Renew")}
             </button>
           )}
           {l.status !== "revoked" && (
             <>
               <button type="button" className="btn" onClick={() => setDialog("edit")}>
-                Edit plan / dates
+                {t("Edit plan / dates")}
               </button>
               <button type="button" className="btn btn-warn" onClick={() => setDialog("reissue")}>
-                Reissue key
+                {t("Reissue key")}
               </button>
             </>
           )}
@@ -88,84 +89,84 @@ export function LicenseDetailPage() {
 
       <dl className="facts">
         <div>
-          <dt>License ID</dt>
+          <dt>{t("License ID")}</dt>
           <dd>
             <code>{l.id}</code>
           </dd>
         </div>
         <div>
-          <dt>Key</dt>
+          <dt>{t("Key")}</dt>
           <dd>
-            <code>{l.key_hint ?? "not issued"}</code>
+            <code>{l.key_hint ?? t("not issued")}</code>
           </dd>
         </div>
         <div>
-          <dt>Stored status</dt>
-          <dd>{l.status}</dd>
+          <dt>{t("Stored status")}</dt>
+          <dd>{t(l.status)}</dd>
         </div>
         <div>
-          <dt>Starts</dt>
+          <dt>{t("Starts")}</dt>
           <dd>{fmtDate(l.starts_at)}</dd>
         </div>
         <div>
-          <dt>Expires</dt>
-          <dd>{l.expires_at ? fmtDate(l.expires_at) : "Never (lifetime)"}</dd>
+          <dt>{t("Expires")}</dt>
+          <dd>{l.expires_at ? fmtDate(l.expires_at) : t("Never (lifetime)")}</dd>
         </div>
         <div>
-          <dt>Grace until</dt>
+          <dt>{t("Grace until")}</dt>
           <dd>{fmtDate(l.grace_until)}</dd>
         </div>
         <div>
-          <dt>Web devices</dt>
+          <dt>{t("Web devices")}</dt>
           <dd>
             {l.usage.web.used} / {l.usage.web.max}
           </dd>
         </div>
         <div>
-          <dt>EA activations</dt>
+          <dt>{t("EA activations")}</dt>
           <dd>
             {l.usage.ea.used} / {l.usage.ea.max}
           </dd>
         </div>
         <div>
-          <dt>Trading accounts</dt>
+          <dt>{t("Trading accounts")}</dt>
           <dd>
             {l.usage.trading_accounts.used} / {l.usage.trading_accounts.max}
           </dd>
         </div>
         <div>
-          <dt>Features</dt>
+          <dt>{t("Features")}</dt>
           <dd>{l.entitlements.features.join(", ") || "—"}</dd>
         </div>
         <div>
-          <dt>EA products / platforms</dt>
+          <dt>{t("EA products / platforms")}</dt>
           <dd>
             {l.entitlements.ea_products.join(", ") || "—"} / {l.entitlements.ea_platforms.join(", ") || "—"}
           </dd>
         </div>
         {l.note && (
           <div>
-            <dt>Note</dt>
+            <dt>{t("Note")}</dt>
             <dd>{l.note}</dd>
           </div>
         )}
       </dl>
 
-      <h2>Activations</h2>
+      <h2>{t("Activations")}</h2>
       <ActivationTable activations={data.activations} onReset={setResetTarget} />
 
-      <h2>History</h2>
+      <h2>{t("History")}</h2>
       {events.loading && !events.data && <Loading />}
       {events.error !== null && <ErrorState error={events.error} onRetry={events.reload} />}
       {events.data &&
         (events.data.data.length === 0 ? (
-          <EmptyState>No events.</EmptyState>
+          <EmptyState>{t("No events.")}</EmptyState>
         ) : (
           <>
             <ul className="timeline">
               {events.data.data.map((e) => (
                 <li key={e.id}>
-                  <span className="muted small">{fmtDate(e.created_at)}</span> <strong>{e.event_type}</strong> <span className="muted">by {e.actor_email ?? e.actor_type}</span>
+                  <span className="muted small">{fmtDate(e.created_at)}</span> <strong>{e.event_type}</strong> <span className="muted">{t("by {actor}", { actor: e.actor_email ?? e.actor_type })}</span>
                   {Object.keys(e.details).length > 0 && <pre className="details-json">{JSON.stringify(e.details, null, 2)}</pre>}
                 </li>
               ))}
@@ -176,13 +177,13 @@ export function LicenseDetailPage() {
 
       {action && (
         <ConfirmDialog
-          title={ACTION_COPY[action].title}
-          message={ACTION_COPY[action].message}
-          confirmLabel={ACTION_COPY[action].label}
+          title={t(ACTION_COPY[action].title)}
+          message={t(ACTION_COPY[action].message)}
+          confirmLabel={t(ACTION_COPY[action].label)}
           danger={ACTION_COPY[action].danger}
           onConfirm={async (reason) => {
             await api.licenseAction(l.id, action, reason);
-            setNotice(ACTION_COPY[action].done);
+            setNotice(t(ACTION_COPY[action].done));
             reload();
           }}
           onClose={() => setAction(null)}
@@ -190,9 +191,9 @@ export function LicenseDetailPage() {
       )}
       {dialog === "reissue" && (
         <ConfirmDialog
-          title="Reissue the license key?"
-          message="A new key is generated and the current key stops working immediately. The customer must enter the new key in every EA."
-          confirmLabel="Reissue key"
+          title={t("Reissue the license key?")}
+          message={t("A new key is generated and the current key stops working immediately. The customer must enter the new key in every EA.")}
+          confirmLabel={t("Reissue key")}
           danger
           requireReason={false}
           onConfirm={async () => {
@@ -203,17 +204,17 @@ export function LicenseDetailPage() {
           onClose={() => setDialog(null)}
         />
       )}
-      {dialog === "renew" && <RenewDialog license={l} onClose={() => setDialog(null)} onDone={() => (setNotice("License renewed."), reload())} />}
-      {dialog === "edit" && <EditDialog license={l} onClose={() => setDialog(null)} onDone={() => (setNotice("License updated."), reload())} />}
+      {dialog === "renew" && <RenewDialog license={l} onClose={() => setDialog(null)} onDone={() => (setNotice(t("License renewed.")), reload())} />}
+      {dialog === "edit" && <EditDialog license={l} onClose={() => setDialog(null)} onDone={() => (setNotice(t("License updated.")), reload())} />}
       {resetTarget && (
         <ConfirmDialog
-          title="Reset this activation?"
-          message={`The ${resetTarget.activation_type.toUpperCase()} activation "${resetTarget.label ?? shortId(resetTarget.id)}" is deactivated and its slot is freed. That device must activate again to keep working.`}
-          confirmLabel="Reset activation"
+          title={t("Reset this activation?")}
+          message={t("The {type} activation \"{label}\" is deactivated and its slot is freed. That device must activate again to keep working.", { type: resetTarget.activation_type.toUpperCase(), label: resetTarget.label ?? shortId(resetTarget.id) })}
+          confirmLabel={t("Reset activation")}
           danger
           onConfirm={async (reason) => {
             await api.revokeActivation(resetTarget.id, reason);
-            setNotice("Activation reset.");
+            setNotice(t("Activation reset."));
             reload();
           }}
           onClose={() => setResetTarget(null)}
@@ -225,20 +226,20 @@ export function LicenseDetailPage() {
 }
 
 export function ActivationTable({ activations, onReset }: { activations: Activation[]; onReset: (a: Activation) => void }) {
-  if (activations.length === 0) return <EmptyState>No devices or EAs have been activated.</EmptyState>;
+  if (activations.length === 0) return <EmptyState>{t("No devices or EAs have been activated.")}</EmptyState>;
   return (
     <div className="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Type</th>
-            <th>Label</th>
-            <th>Product</th>
-            <th>Status</th>
-            <th>First seen</th>
-            <th>Last seen</th>
+            <th>{t("Type")}</th>
+            <th>{t("Label")}</th>
+            <th>{t("Product")}</th>
+            <th>{t("Status")}</th>
+            <th>{t("First seen")}</th>
+            <th>{t("Last seen")}</th>
             <th>
-              <span className="sr-only">Actions</span>
+              <span className="sr-only">{t("Actions")}</span>
             </th>
           </tr>
         </thead>
@@ -248,7 +249,7 @@ export function ActivationTable({ activations, onReset }: { activations: Activat
               <td>{a.activation_type.toUpperCase()}</td>
               <td>
                 {a.label ?? <span className="muted">{shortId(a.id)}</span>}
-                {a.has_account_ref && <span className="muted small"> · account-bound</span>}
+                {a.has_account_ref && <span className="muted small"> {t("· account-bound")}</span>}
               </td>
               <td>{a.product}</td>
               <td>
@@ -259,7 +260,7 @@ export function ActivationTable({ activations, onReset }: { activations: Activat
               <td>
                 {a.status === "active" && (
                   <button type="button" className="btn btn-small btn-warn" onClick={() => onReset(a)}>
-                    Reset
+                    {t("Reset")}
                   </button>
                 )}
               </td>
@@ -281,12 +282,12 @@ function RenewDialog({ license, onClose, onDone }: { license: LicenseDetail["lic
   const valid = reason.trim().length >= 3 && (mode === "periods" ? periods >= 1 : !!date);
   return (
     <Modal
-      title="Renew license"
+      title={t("Renew license")}
       onClose={busy ? () => {} : onClose}
       footer={
         <>
           <button type="button" className="btn" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button
             type="button"
@@ -305,29 +306,29 @@ function RenewDialog({ license, onClose, onDone }: { license: LicenseDetail["lic
               }
             }}
           >
-            {busy ? "Renewing…" : "Renew"}
+            {busy ? t("Renewing…") : t("Renew")}
           </button>
         </>
       }
     >
-      <p>Current expiry: {fmtDate(license.expires_at)}. Renewal adds time from the later of today and the current expiry.</p>
+      <p>{t("Current expiry: {date}. Renewal adds time from the later of today and the current expiry.", { date: fmtDate(license.expires_at) })}</p>
       <label className="check">
-        <input type="radio" checked={mode === "periods"} onChange={() => setMode("periods")} /> Add billing periods
+        <input type="radio" checked={mode === "periods"} onChange={() => setMode("periods")} /> {t("Add billing periods")}
       </label>
       {mode === "periods" && (
-        <Field label="Number of periods">
+        <Field label={t("Number of periods")}>
           <input type="number" min={1} max={36} value={periods} onChange={(e) => setPeriods(Number(e.target.value))} />
         </Field>
       )}
       <label className="check">
-        <input type="radio" checked={mode === "date"} onChange={() => setMode("date")} /> Set a specific expiry date
+        <input type="radio" checked={mode === "date"} onChange={() => setMode("date")} /> {t("Set a specific expiry date")}
       </label>
       {mode === "date" && (
-        <Field label="New expiry">
+        <Field label={t("New expiry")}>
           <input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
         </Field>
       )}
-      <Field label="Reason (saved in the audit log)">
+      <Field label={t("Reason (saved in the audit log)")}>
         <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
       </Field>
       {error !== null && (
@@ -376,15 +377,15 @@ function EditDialog({ license, onClose, onDone }: { license: LicenseDetail["lice
 
   return (
     <Modal
-      title="Edit license"
+      title={t("Edit license")}
       onClose={busy ? () => {} : onClose}
       footer={
         <>
           <button type="button" className="btn" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="button" className="btn btn-primary" onClick={save} disabled={busy}>
-            {busy ? "Saving…" : "Save changes"}
+            {busy ? t("Saving…") : t("Save changes")}
           </button>
         </>
       }
@@ -392,25 +393,25 @@ function EditDialog({ license, onClose, onDone }: { license: LicenseDetail["lice
       {plans.loading && <Loading />}
       {plans.data && (
         <div className="form-grid">
-          <Field label="Plan" hint="Changing the plan changes limits and features immediately." error={errs.plan_id}>
+          <Field label={t("Plan")} hint={t("Changing the plan changes limits and features immediately.")} error={errs.plan_id}>
             <select value={planId} onChange={(e) => setPlanId(e.target.value)}>
               {plans.data.data.map((p) => (
                 <option key={p.id} value={p.id} disabled={!p.is_active && p.id !== license.plan.id}>
-                  {p.name} ({p.code}){p.is_active ? "" : " – disabled"}
+                  {p.name} ({p.code}){p.is_active ? "" : ` – ${t("disabled")}`}
                 </option>
               ))}
             </select>
           </Field>
-          <Field label="Starts" error={errs.starts_at}>
+          <Field label={t("Starts")} error={errs.starts_at}>
             <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} />
           </Field>
-          <Field label="Expires" hint="Empty = never (lifetime plans only)." error={errs.expires_at}>
+          <Field label={t("Expires")} hint={t("Empty = never (lifetime plans only).")} error={errs.expires_at}>
             <input type="datetime-local" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
           </Field>
-          <Field label="Grace until" error={errs.grace_until}>
+          <Field label={t("Grace until")} error={errs.grace_until}>
             <input type="datetime-local" value={graceUntil} onChange={(e) => setGraceUntil(e.target.value)} />
           </Field>
-          <Field label="Note for the audit log (optional)">
+          <Field label={t("Note for the audit log (optional)")}>
             <textarea rows={2} value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} />
           </Field>
         </div>

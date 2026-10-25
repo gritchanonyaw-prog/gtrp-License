@@ -9,6 +9,7 @@ import { useAsync } from "../hooks/useAsync";
 import { ApiError, api } from "../services/api";
 import { fmtMoney } from "../services/format";
 import type { Plan } from "../types";
+import { t } from "../i18n";
 
 export function PlansPage() {
   const { data, error, loading, reload } = useAsync(() => api.plans(), []);
@@ -19,9 +20,9 @@ export function PlansPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Plans</h1>
+        <h1>{t("Plans")}</h1>
         <button type="button" className="btn btn-primary" onClick={() => setEditing("new")}>
-          New plan
+          {t("New plan")}
         </button>
       </div>
       <p className="muted">Changes to a plan apply to every license on it from the next request. Lowering a limit does not remove existing activations; it blocks new ones until usage drops.</p>
@@ -34,21 +35,21 @@ export function PlansPage() {
       {error !== null && <ErrorState error={error} onRetry={reload} />}
       {data &&
         (data.data.length === 0 ? (
-          <EmptyState>No plans yet. Create the first plan to start issuing licenses.</EmptyState>
+          <EmptyState>{t("No plans yet. Create the first plan to start issuing licenses.")}</EmptyState>
         ) : (
           <div className="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Plan</th>
-                  <th>Price</th>
-                  <th>Web devices</th>
-                  <th>EA activations</th>
-                  <th>Trading accounts</th>
-                  <th>Features</th>
-                  <th>Status</th>
+                  <th>{t("Plan")}</th>
+                  <th>{t("Price")}</th>
+                  <th>{t("Web devices")}</th>
+                  <th>{t("EA activations")}</th>
+                  <th>{t("Trading accounts")}</th>
+                  <th>{t("Features")}</th>
+                  <th>{t("Status")}</th>
                   <th>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{t("Actions")}</span>
                   </th>
                 </tr>
               </thead>
@@ -61,7 +62,7 @@ export function PlansPage() {
                       <code className="small">{p.code}</code>
                     </td>
                     <td>
-                      {fmtMoney(p.price_minor, p.currency)} / {p.billing_period}
+                      {fmtMoney(p.price_minor, p.currency)} / {t(p.billing_period)}
                     </td>
                     <td>{p.entitlements.web_access ? p.max_web_devices : "—"}</td>
                     <td>
@@ -69,18 +70,18 @@ export function PlansPage() {
                     </td>
                     <td>
                       {p.max_trading_accounts}
-                      {p.entitlements.require_account_binding ? "" : <span className="muted small"> (not enforced)</span>}
+                      {p.entitlements.require_account_binding ? "" : <span className="muted small"> {t("(not enforced)")}</span>}
                     </td>
                     <td className="small">{p.entitlements.features.join(", ") || "—"}</td>
                     <td>
-                      <StatusBadge status={p.is_active ? "active" : "suspended"} label={p.is_active ? "enabled" : "disabled"} />
+                      <StatusBadge status={p.is_active ? "active" : "suspended"} label={p.is_active ? t("enabled") : t("disabled")} />
                     </td>
                     <td className="nowrap">
                       <button type="button" className="btn btn-small" onClick={() => setEditing(p)}>
-                        Edit
+                        {t("Edit")}
                       </button>{" "}
                       <button type="button" className={`btn btn-small ${p.is_active ? "btn-warn" : ""}`} onClick={() => setToggling(p)}>
-                        {p.is_active ? "Disable" : "Enable"}
+                        {p.is_active ? t("Disable") : t("Enable")}
                       </button>
                     </td>
                   </tr>
@@ -102,18 +103,18 @@ export function PlansPage() {
       )}
       {toggling && (
         <ConfirmDialog
-          title={toggling.is_active ? `Disable ${toggling.name}?` : `Enable ${toggling.name}?`}
+          title={toggling.is_active ? t("Disable {name}?", { name: toggling.name }) : t("Enable {name}?", { name: toggling.name })}
           message={
             toggling.is_active
-              ? "The plan is hidden from the public plan list and cannot be used for new licenses or purchases. Existing licenses on this plan keep working."
-              : "The plan becomes available for new licenses and purchases."
+              ? t("The plan is hidden from the public plan list and cannot be used for new licenses or purchases. Existing licenses on this plan keep working.")
+              : t("The plan becomes available for new licenses and purchases.")
           }
-          confirmLabel={toggling.is_active ? "Disable plan" : "Enable plan"}
+          confirmLabel={toggling.is_active ? t("Disable plan") : t("Enable plan")}
           danger={toggling.is_active}
           requireReason={false}
           onConfirm={async () => {
             await api.updatePlan(toggling.id, { is_active: !toggling.is_active });
-            setNotice(`Plan ${toggling.is_active ? "disabled" : "enabled"}.`);
+            setNotice(toggling.is_active ? t("Plan disabled.") : t("Plan enabled."));
             reload();
           }}
           onClose={() => setToggling(null)}
@@ -173,10 +174,10 @@ export function PlanForm({ plan, onClose, onSaved }: { plan: Plan | null; onClos
       if (plan) {
         if (body.billing_period === plan.billing_period) delete body.billing_period;
         await api.updatePlan(plan.id, body);
-        onSaved("Plan saved.");
+        onSaved(t("Plan saved."));
       } else {
         await api.createPlan({ ...body, code: code.trim().toUpperCase(), is_active: true });
-        onSaved("Plan created.");
+        onSaved(t("Plan created."));
       }
     } catch (e) {
       setError(e);
@@ -186,66 +187,66 @@ export function PlanForm({ plan, onClose, onSaved }: { plan: Plan | null; onClos
 
   return (
     <Modal
-      title={plan ? `Edit ${plan.name}` : "New plan"}
+      title={plan ? t("Edit {name}", { name: plan.name }) : t("New plan")}
       onClose={busy ? () => {} : onClose}
       footer={
         <>
           <button type="button" className="btn" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="button" className="btn btn-primary" onClick={save} disabled={busy || !name || (!plan && !code)}>
-            {busy ? "Saving…" : "Save plan"}
+            {busy ? t("Saving…") : t("Save plan")}
           </button>
         </>
       }
     >
       <div className="form-grid two">
-        <Field label="Code" hint="UPPER_SNAKE_CASE, cannot be changed later" error={errs.code}>
+        <Field label={t("Code")} hint={t("UPPER_SNAKE_CASE, cannot be changed later")} error={errs.code}>
           <input value={code} onChange={(e) => setCode(e.target.value)} disabled={!!plan} placeholder="QUANT_PRO" />
         </Field>
-        <Field label="Display name" error={errs.name}>
+        <Field label={t("Display name")} error={errs.name}>
           <input value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
-        <Field label="Price" error={errs.price_minor}>
+        <Field label={t("Price")} error={errs.price_minor}>
           <input type="number" min={0} step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
         </Field>
-        <Field label="Currency" error={errs.currency}>
+        <Field label={t("Currency")} error={errs.currency}>
           <input value={currency} maxLength={3} onChange={(e) => setCurrency(e.target.value)} />
         </Field>
-        <Field label="Billing period" hint={plan ? "Switching to or from lifetime is not allowed" : undefined} error={errs.billing_period}>
+        <Field label={t("Billing period")} hint={plan ? t("Switching to or from lifetime is not allowed") : undefined} error={errs.billing_period}>
           <select value={billing} onChange={(e) => setBilling(e.target.value as typeof billing)}>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-            <option value="lifetime">Lifetime</option>
+            <option value="monthly">{t("Monthly")}</option>
+            <option value="yearly">{t("Yearly")}</option>
+            <option value="lifetime">{t("Lifetime")}</option>
           </select>
         </Field>
-        <Field label="Max Web App devices" error={errs.max_web_devices}>
+        <Field label={t("Max Web App devices")} error={errs.max_web_devices}>
           <input type="number" min={0} max={1000} value={maxWeb} onChange={(e) => setMaxWeb(Number(e.target.value))} />
         </Field>
-        <Field label="Max EA activations (MT4 + MT5)" error={errs.max_ea_activations}>
+        <Field label={t("Max EA activations (MT4 + MT5)")} error={errs.max_ea_activations}>
           <input type="number" min={0} max={1000} value={maxEa} onChange={(e) => setMaxEa(Number(e.target.value))} />
         </Field>
-        <Field label="Max trading accounts" hint="Enforced only when account binding is on" error={errs.max_trading_accounts}>
+        <Field label={t("Max trading accounts")} hint={t("Enforced only when account binding is on")} error={errs.max_trading_accounts}>
           <input type="number" min={0} max={1000} value={maxAcc} onChange={(e) => setMaxAcc(Number(e.target.value))} />
         </Field>
       </div>
       <fieldset className="field">
-        <legend>Web App</legend>
+        <legend>{t("Web App")}</legend>
         <label className="check">
-          <input type="checkbox" checked={webAccess} onChange={(e) => setWebAccess(e.target.checked)} /> Web App access
+          <input type="checkbox" checked={webAccess} onChange={(e) => setWebAccess(e.target.checked)} /> {t("Web App access")}
         </label>
         {KNOWN_FEATURES.map((f) => (
           <label className="check" key={f}>
             <input type="checkbox" checked={features.includes(f)} onChange={() => toggle(features, f, setFeatures)} disabled={!webAccess} /> {f}
           </label>
         ))}
-        <Field label="Other feature keys (comma separated)" error={errs.entitlements}>
+        <Field label={t("Other feature keys (comma separated)")} error={errs.entitlements}>
           <input value={extraFeatures} onChange={(e) => setExtraFeatures(e.target.value)} disabled={!webAccess} />
         </Field>
       </fieldset>
       <fieldset className="field">
-        <legend>Expert Advisors</legend>
-        <Field label="EA product IDs (comma separated)" hint="e.g. gtrp_ea">
+        <legend>{t("Expert Advisors")}</legend>
+        <Field label={t("EA product IDs (comma separated)")} hint={t("e.g. gtrp_ea")}>
           <input value={eaProducts} onChange={(e) => setEaProducts(e.target.value)} />
         </Field>
         {(["mt4", "mt5"] as const).map((p) => (
@@ -254,7 +255,7 @@ export function PlanForm({ plan, onClose, onSaved }: { plan: Plan | null; onClos
           </label>
         ))}
         <label className="check">
-          <input type="checkbox" checked={binding} onChange={(e) => setBinding(e.target.checked)} /> Bind each EA to a trading account (required to enforce the trading-account limit)
+          <input type="checkbox" checked={binding} onChange={(e) => setBinding(e.target.checked)} /> {t("Bind each EA to a trading account (required to enforce the trading-account limit)")}
         </label>
       </fieldset>
       {error !== null && (

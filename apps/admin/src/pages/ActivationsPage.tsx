@@ -8,6 +8,7 @@ import { useAsync } from "../hooks/useAsync";
 import { useQueryState } from "../hooks/useQueryState";
 import { api, type AdminActivationRow } from "../services/api";
 import { fmtDate, shortId } from "../services/format";
+import { t } from "../i18n";
 
 const TABS = [
   { value: "", label: "All" },
@@ -26,19 +27,19 @@ export function ActivationsPage() {
   return (
     <section>
       <div className="page-head">
-        <h1>Activations</h1>
+        <h1>{t("Activations")}</h1>
       </div>
-      <div className="tabs" role="tablist" aria-label="Activation type">
-        {TABS.map((t) => (
-          <button key={t.value} type="button" role="tab" aria-selected={values.activation_type === t.value} className={values.activation_type === t.value ? "tab active" : "tab"} onClick={() => set({ activation_type: t.value })}>
-            {t.label}
+      <div className="tabs" role="tablist" aria-label={t("Activation type")}>
+        {TABS.map((tab) => (
+          <button key={tab.value} type="button" role="tab" aria-selected={values.activation_type === tab.value} className={values.activation_type === tab.value ? "tab active" : "tab"} onClick={() => set({ activation_type: tab.value })}>
+            {t(tab.label)}
           </button>
         ))}
         <label className="field inline push-right">
-          <span>Status</span>
+          <span>{t("Status")}</span>
           <select value={status} onChange={(e) => set({ status: e.target.value })}>
-            <option value="active">Active</option>
-            <option value="revoked">Revoked</option>
+            <option value="active">{t("Active")}</option>
+            <option value="revoked">{t("Revoked")}</option>
           </select>
         </label>
       </div>
@@ -52,20 +53,20 @@ export function ActivationsPage() {
       {data && !loading && (
         <>
           {data.data.length === 0 ? (
-            <EmptyState>No activations.</EmptyState>
+            <EmptyState>{t("No activations.")}</EmptyState>
           ) : (
             <div className="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Type</th>
-                    <th>Customer</th>
-                    <th>Label</th>
-                    <th>Status</th>
-                    <th>Last seen</th>
-                    <th>License</th>
+                    <th>{t("Type")}</th>
+                    <th>{t("Customer")}</th>
+                    <th>{t("Label")}</th>
+                    <th>{t("Status")}</th>
+                    <th>{t("Last seen")}</th>
+                    <th>{t("License")}</th>
                     <th>
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">{t("Actions")}</span>
                     </th>
                   </tr>
                 </thead>
@@ -87,7 +88,7 @@ export function ActivationsPage() {
                       <td>
                         {a.status === "active" && (
                           <button type="button" className="btn btn-small btn-warn" onClick={() => setTarget(a)}>
-                            Revoke
+                            {t("Revoke")}
                           </button>
                         )}
                       </td>
@@ -102,13 +103,13 @@ export function ActivationsPage() {
       )}
       {target && (
         <ConfirmDialog
-          title="Revoke this activation?"
-          message={`${target.email}'s ${target.activation_type.toUpperCase()} activation is deactivated and its slot is freed.`}
-          confirmLabel="Revoke activation"
+          title={t("Revoke this activation?")}
+          message={t("{email}'s {type} activation is deactivated and its slot is freed.", { email: target.email, type: target.activation_type.toUpperCase() })}
+          confirmLabel={t("Revoke activation")}
           danger
           onConfirm={async (reason) => {
             await api.revokeActivation(target.id, reason);
-            setNotice("Activation revoked.");
+            setNotice(t("Activation revoked."));
             reload();
           }}
           onClose={() => setTarget(null)}

@@ -1,18 +1,27 @@
 import type { ReactNode } from "react";
 import { ApiError } from "../services/api";
+import { currentLang, t } from "../i18n";
 
-export function Loading({ label = "Loading…" }: { label?: string }) {
+export function Loading({ label }: { label?: string }) {
   return (
     <div className="state" role="status" aria-live="polite">
       <span className="spinner" aria-hidden="true" />
-      {label}
+      {label ?? t("Loading…")}
     </div>
   );
 }
 
+/** Server messages are English; in Thai, known error codes get a Thai message and anything else falls back to the server text. */
+function translateError(e: ApiError): string {
+  if (currentLang() === "en") return e.message;
+  const key = `error.${e.code}`;
+  const msg = t(key);
+  return msg === key ? e.message : msg;
+}
+
 export function errorMessage(e: unknown): string {
-  if (e instanceof ApiError) return e.message;
-  return "Something went wrong. Please try again.";
+  if (e instanceof ApiError) return translateError(e);
+  return t("Something went wrong. Please try again.");
 }
 
 export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () => void }) {
@@ -29,10 +38,10 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
           ))}
         </ul>
       )}
-      {rid && <p className="muted small">Reference: {rid}</p>}
+      {rid && <p className="muted small">{t("Reference: {id}", { id: rid })}</p>}
       {onRetry && (
         <button type="button" className="btn" onClick={onRetry}>
-          Try again
+          {t("Try again")}
         </button>
       )}
     </div>
@@ -48,7 +57,7 @@ export function Alert({ kind, children, onClose }: { kind: "success" | "error" |
     <div className={`alert alert-${kind}`} role={kind === "error" ? "alert" : "status"}>
       <div>{children}</div>
       {onClose && (
-        <button type="button" className="btn-link" onClick={onClose} aria-label="Dismiss">
+        <button type="button" className="btn-link" onClick={onClose} aria-label={t("Dismiss")}>
           ×
         </button>
       )}

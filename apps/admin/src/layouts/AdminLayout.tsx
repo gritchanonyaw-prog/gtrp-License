@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router";
 import { useAuth } from "../hooks/useAuth";
+import { LanguageSwitcher, t } from "../i18n";
 
 const NAV = [
   { to: "/", label: "Overview", end: true },
@@ -19,20 +20,21 @@ export function AdminLayout() {
     <div className="layout">
       <header className="topbar">
         <button type="button" className="btn menu-toggle" aria-expanded={open} aria-controls="sidebar" onClick={() => setOpen((o) => !o)}>
-          Menu
+          {t("Menu")}
         </button>
-        <span className="brand">GTRP License Admin</span>
+        <span className="brand">{t("GTRP License Admin")}</span>
         <span className="topbar-user">
+          <LanguageSwitcher />
           <span className="muted">{user?.email}</span>
           <button type="button" className="btn" onClick={() => void logout()}>
-            Sign out
+            {t("Sign out")}
           </button>
         </span>
       </header>
-      <nav id="sidebar" className={`sidebar${open ? " open" : ""}`} aria-label="Main">
+      <nav id="sidebar" className={`sidebar${open ? " open" : ""}`} aria-label={t("Main")}>
         {NAV.map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end} onClick={() => setOpen(false)}>
-            {n.label}
+            {t(n.label)}
           </NavLink>
         ))}
       </nav>

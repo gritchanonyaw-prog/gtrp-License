@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { errorMessage } from "./States";
 import { Modal } from "./Modal";
+import { t } from "../i18n";
 
 /**
  * Confirmation for destructive or sensitive actions. When `requireReason` is set the
@@ -47,10 +48,10 @@ export function ConfirmDialog({
       footer={
         <>
           <button type="button" className="btn" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="button" className={`btn ${danger ? "btn-danger" : "btn-primary"}`} onClick={run} disabled={!valid || busy}>
-            {busy ? "Working…" : confirmLabel}
+            {busy ? t("Working…") : confirmLabel}
           </button>
         </>
       }
@@ -58,7 +59,7 @@ export function ConfirmDialog({
       <div>{message}</div>
       {requireReason && (
         <label className="field">
-          <span>Reason (saved in the audit log)</span>
+          <span>{t("Reason (saved in the audit log)")}</span>
           <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} maxLength={500} required aria-required="true" />
         </label>
       )}

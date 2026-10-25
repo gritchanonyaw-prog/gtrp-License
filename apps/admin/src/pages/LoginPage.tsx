@@ -4,6 +4,7 @@ import { Field } from "../components/Field";
 import { errorMessage } from "../components/States";
 import { useAuth } from "../hooks/useAuth";
 import { ApiError, api } from "../services/api";
+import { LanguageSwitcher, t } from "../i18n";
 
 export function LoginPage() {
   const { user, refresh } = useAuth();
@@ -37,15 +38,18 @@ export function LoginPage() {
   return (
     <div className="login-wrap">
       <form className="card login" onSubmit={submit} noValidate>
-        <h1>GTRP License Admin</h1>
-        <Field label="Email">
+        <div className="login-head">
+          <h1>{t("GTRP License Admin")}</h1>
+          <LanguageSwitcher />
+        </div>
+        <Field label={t("Email")}>
           <input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </Field>
-        <Field label="Password">
+        <Field label={t("Password")}>
           <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </Field>
         {needCode && (
-          <Field label="Authentication code" hint="6-digit code from your authenticator app">
+          <Field label={t("Authentication code")} hint={t("6-digit code from your authenticator app")}>
             <input inputMode="numeric" autoComplete="one-time-code" pattern="\d{6}" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} autoFocus required />
           </Field>
         )}
@@ -55,7 +59,7 @@ export function LoginPage() {
           </p>
         )}
         <button type="submit" className="btn btn-primary" disabled={busy || !email || !password || (needCode && code.length !== 6)}>
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? t("Signing in…") : t("Sign in")}
         </button>
       </form>
     </div>

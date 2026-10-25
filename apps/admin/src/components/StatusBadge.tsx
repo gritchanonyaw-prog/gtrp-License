@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 const TONES: Record<string, string> = {
   active: "ok",
   paid: "ok",
@@ -13,5 +14,5 @@ const TONES: Record<string, string> = {
 };
 
 export function StatusBadge({ status, label }: { status: string; label?: string }) {
-  return <span className={`badge badge-${TONES[status] ?? "info"}`}>{label ?? status.replace("_", " ")}</span>;
+  return <span className={`badge badge-${TONES[status] ?? "info"}`}>{label ?? t(status.replace("_", " "))}</span>;
 }
