@@ -113,7 +113,8 @@ Protocol errors. Clients must treat **only** the confirmed denials as "stop open
 | --- | --- | --- |
 | `LICENSE_INVALID`, `LICENSE_NOT_STARTED`, `LICENSE_NOT_ACTIVE`, `LICENSE_EXPIRED`, `LICENSE_SUSPENDED`, `LICENSE_REVOKED` | 403 | confirmed denial |
 | `PRODUCT_NOT_ENTITLED`, `PLATFORM_NOT_ENTITLED` | 403 | confirmed denial |
-| `ACTIVATION_LIMIT_REACHED`, `ACCOUNT_LIMIT_REACHED`, `ACCOUNT_REF_REQUIRED`, `ACCOUNT_MISMATCH` | 403 | confirmed denial |
+| `ACTIVATION_LIMIT_REACHED`, `ACCOUNT_LIMIT_REACHED`, `ACCOUNT_MISMATCH` | 409 | confirmed denial |
+| `ACCOUNT_REF_REQUIRED` | 403 | confirmed denial (client retries once with `account_ref`) |
 | `ACTIVATION_NOT_FOUND`, `ACTIVATION_REVOKED` | 403/404 | confirmed denial (client may re-activate on NOT_FOUND) |
 | `LEASE_INVALID`, `LEASE_EXPIRED` | 401 | fall back to `validate` with the key |
 | `CLOCK_SKEW` | 400 | correct the clock from `error.server_time`, retry once |
