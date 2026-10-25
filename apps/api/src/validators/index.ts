@@ -5,7 +5,7 @@ import { errors } from "../errors/index.js";
 
 type Target = "json" | "query" | "param";
 
-function issuesToDetails(issues: readonly z.core.$ZodIssue[]) {
+export function issuesToDetails(issues: readonly z.core.$ZodIssue[]) {
   // Never echo submitted values back (they may contain keys or passwords).
   return issues.slice(0, 20).map((i) => ({ path: i.path.map(String).join(".") || "(root)", message: i.message }));
 }

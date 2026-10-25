@@ -92,6 +92,7 @@ export interface PaymentRow {
   currency: string;
   status: PaymentStatus;
   paid_event_id: string | null;
+  refund_event_id: string | null;
   paid_at: string | null;
   refunded_at: string | null;
   created_at: string;

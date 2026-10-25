@@ -34,3 +34,22 @@ export async function listAdminPayments(db: D1Database, f: PaymentFilters, page:
   ]);
   return { rows: rows!.results, total: (total!.results[0] as { n: number }).n };
 }
+
+export function getPaymentEvent(db: D1Database, provider: string, providerEventId: string) {
+  return db
+    .prepare("SELECT result FROM payment_events WHERE provider = ? AND provider_event_id = ?")
+    .bind(provider, providerEventId)
+    .first<{ result: string }>();
+}
+
+export async function listPaymentsForUser(db: D1Database, userId: string) {
+  const r = await db
+    .prepare(
+      `SELECT p.id, p.license_id, p.plan_id, pl.code AS plan_code, pl.name AS plan_name, p.provider, p.amount_minor, p.currency,
+              p.status, p.paid_at, p.refunded_at, p.created_at
+       FROM payments p JOIN plans pl ON pl.id = p.plan_id WHERE p.user_id = ? ORDER BY p.created_at DESC LIMIT 100`,
+    )
+    .bind(userId)
+    .all();
+  return r.results;
+}

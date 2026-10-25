@@ -11,6 +11,7 @@ import { adminRoutes } from "./routes/admin/index.js";
 import { authRoutes } from "./routes/auth.js";
 import { healthRoutes } from "./routes/health.js";
 import { licenseRoutes } from "./routes/licenses.js";
+import { paymentRoutes } from "./routes/payments.js";
 import { runScheduledMaintenance } from "./services/maintenance.js";
 import { ERROR_CODES } from "@gtrp/shared";
 
@@ -44,6 +45,7 @@ app.use("/api/*", csrfProtection, loadSession);
 app.route("/api/v1", healthRoutes);
 app.route("/api/v1", authRoutes);
 app.route("/api/v1", licenseRoutes);
+app.route("/api/v1", paymentRoutes);
 app.route("/api/v1/admin", adminRoutes);
 
 app.notFound(notFound);
