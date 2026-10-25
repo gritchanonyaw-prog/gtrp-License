@@ -2,6 +2,7 @@ import { ERROR_CODES } from "@gtrp/shared";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AppEnv } from "../env.js";
+import { nowIso } from "../clock.js";
 import { AppError } from "../errors/index.js";
 import { log } from "../security/redact.js";
 
@@ -12,6 +13,8 @@ export function errorBody(c: Context<AppEnv>, e: AppError) {
       message: e.message,
       request_id: c.get("requestId") ?? "unknown",
       retryable: e.retryable,
+      /** Lets EA/web clients correct their clock offset after a CLOCK_SKEW error. */
+      server_time: nowIso(),
       ...(e.details ? { details: e.details } : {}),
     },
   };

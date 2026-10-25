@@ -8,7 +8,7 @@ describe("health endpoint", () => {
     const res = await call("/api/v1/health");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
-    expect(body).toMatchObject({ status: "ok", checks: { database: "ok" }, protocol_versions: [1] });
+    expect(body).toMatchObject({ status: "ok", environment: "test", checks: { database: "ok" }, protocol_versions: [1] });
     expect(res.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{36}$/);
     expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(res.headers.get("Cache-Control")).toBe("no-store");
