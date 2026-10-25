@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "ea-examples/reference-client"
 
 onlyBuiltDependencies:
   - esbuild

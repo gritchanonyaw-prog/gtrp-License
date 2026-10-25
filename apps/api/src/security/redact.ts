@@ -27,7 +27,8 @@ export function redact(value: unknown, depth = 0): unknown {
 }
 
 export function log(level: "info" | "warn" | "error", message: string, fields: Record<string, unknown> = {}) {
-  const line = JSON.stringify({ level, message: redactString(message), ...(redact(fields) as object), ts: new Date().toISOString() });
+  // Fixed keys come last so caller-supplied fields can never overwrite them.
+  const line = JSON.stringify({ ...(redact(fields) as object), level, event: redactString(message), ts: new Date().toISOString() });
   if (level === "error") console.error(line);
   else if (level === "warn") console.warn(line);
   else console.log(line);

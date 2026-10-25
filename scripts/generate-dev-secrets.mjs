@@ -19,8 +19,9 @@ const values = {
   MFA_ENCRYPTION_KEY: randomBytes(32).toString("base64"),
   MOCK_PAYMENT_WEBHOOK_SECRET: randomBytes(32).toString("hex"),
 };
+// Single quotes: dotenv keeps the value literally (the JWK contains double quotes).
 const body = Object.entries(values)
-  .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+  .map(([k, v]) => `${k}='${v}'`)
   .join("\n");
 
 if (print) {
