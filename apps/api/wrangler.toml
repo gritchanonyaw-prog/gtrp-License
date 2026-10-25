@@ -1,0 +1,92 @@
+# GTRP License API - Cloudflare Worker
+# The admin dashboard (apps/admin/dist) is served by the same Worker as static
+# assets, so the dashboard and API share one origin (SameSite=Strict cookies, no CORS).
+#
+# Secrets are NEVER stored here. Set them with:
+#   wrangler secret put LICENSE_KEY_PEPPER        [--env staging|production]
+#   wrangler secret put LEASE_SIGNING_PRIVATE_JWK [--env staging|production]
+#   wrangler secret put MFA_ENCRYPTION_KEY        [--env staging|production]
+# For local development they come from .dev.vars (see scripts/generate-dev-secrets.mjs).
+
+name = "gtrp-license-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[assets]
+directory = "../admin/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[observability]
+enabled = true
+
+[triggers]
+# Hourly maintenance: expire licenses, purge nonces / rate-limit windows / old sessions
+crons = ["17 * * * *"]
+
+[vars]
+ENVIRONMENT = "development"
+APP_ORIGINS = "http://localhost:5173,http://localhost:8787"
+COOKIE_SECURE = "false"
+REQUIRE_ADMIN_MFA = "false"
+PAYMENTS_MOCK_ENABLED = "true"
+LEASE_SIGNING_KEY_ID = "dev-1"
+LEASE_TTL_SECONDS = "86400"
+REVALIDATE_AFTER_SECONDS = "1800"
+SESSION_TTL_HOURS = "12"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gtrp-license-dev"
+database_id = "00000000-0000-4000-8000-000000000000"
+migrations_dir = "../../migrations"
+
+# ---------------------------------------------------------------- staging
+[env.staging]
+name = "gtrp-license-api-staging"
+workers_dev = true
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+APP_ORIGINS = "https://gtrp-license-api-staging.example.workers.dev"
+COOKIE_SECURE = "true"
+REQUIRE_ADMIN_MFA = "true"
+PAYMENTS_MOCK_ENABLED = "true"
+LEASE_SIGNING_KEY_ID = "stg-1"
+LEASE_TTL_SECONDS = "86400"
+REVALIDATE_AFTER_SECONDS = "1800"
+SESSION_TTL_HOURS = "12"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "gtrp-license-staging"
+# Replace with the id printed by: wrangler d1 create gtrp-license-staging
+database_id = "REPLACE_WITH_STAGING_D1_DATABASE_ID"
+migrations_dir = "../../migrations"
+
+# ------------------------------------------------------------- production
+[env.production]
+name = "gtrp-license-api-production"
+workers_dev = false
+# routes = [{ pattern = "license.example.com", custom_domain = true }]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+APP_ORIGINS = "https://license.example.com"
+COOKIE_SECURE = "true"
+REQUIRE_ADMIN_MFA = "true"
+# Live payments stay disabled until a real provider adapter and its secrets are configured.
+PAYMENTS_MOCK_ENABLED = "false"
+LEASE_SIGNING_KEY_ID = "prod-1"
+LEASE_TTL_SECONDS = "86400"
+REVALIDATE_AFTER_SECONDS = "1800"
+SESSION_TTL_HOURS = "8"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "gtrp-license-production"
+# Replace with the id printed by: wrangler d1 create gtrp-license-production
+database_id = "REPLACE_WITH_PRODUCTION_D1_DATABASE_ID"
+migrations_dir = "../../migrations"
