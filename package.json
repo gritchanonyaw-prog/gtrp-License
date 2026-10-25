@@ -8,12 +8,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm --filter @gtrp/admin build && pnpm --filter @gtrp/api build",
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
     "dev:api": "pnpm --filter @gtrp/api dev",
     "dev:admin": "pnpm --filter @gtrp/admin dev",
     "db:migrate:local": "pnpm --filter @gtrp/api db:migrate:local",
-    "secrets:dev": "node scripts/generate-dev-secrets.mjs"
+    "secrets:dev": "node scripts/generate-dev-secrets.mjs",
+    "db:seed:local": "pnpm --filter @gtrp/api db:seed:local",
+    "mock:pay": "node scripts/mock-payment.mjs"
   }
 }

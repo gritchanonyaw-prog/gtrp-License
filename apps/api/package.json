@@ -12,7 +12,8 @@
     "db:migrate:staging": "wrangler d1 migrations apply DB --remote --env staging",
     "db:migrate:production": "wrangler d1 migrations apply DB --remote --env production",
     "deploy:staging": "wrangler deploy --env staging",
-    "deploy:production": "wrangler deploy --env production"
+    "deploy:production": "wrangler deploy --env production",
+    "db:seed:local": "wrangler d1 execute DB --local --file ../../scripts/seed-dev.sql"
   },
   "dependencies": {
     "@gtrp/shared": "workspace:*",
