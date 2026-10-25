@@ -146,7 +146,7 @@ describe("customers, activations, audit, metrics", () => {
     const s = await call(`/api/v1/admin/customers/${w.customerId}/status`, { cookie: w.admin, json: { status: "suspended", reason: "abuse report" } });
     expect(s.body.status).toBe("suspended");
     expect((await eaActivate(w.key)).body.error.code).toBe("LICENSE_SUSPENDED");
-    await call(`/api/v1/admin/customers/${w.customerId}/delete`, { cookie: w.admin, method: "POST" });
+    await call(`/api/v1/admin/customers/${w.customerId}/delete`, { cookie: w.admin, json: { reason: "customer asked for deletion" } });
     const u = await db().prepare("SELECT email, password_hash, status FROM users WHERE id = ?").bind(w.customerId).first<{ email: string; password_hash: string | null; status: string }>();
     expect(u).toMatchObject({ status: "deleted", password_hash: null });
     expect(u!.email).not.toContain("customer@gtrp.test");

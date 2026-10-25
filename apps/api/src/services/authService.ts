@@ -169,7 +169,7 @@ export async function deleteOwnAccount(c: Context<AppEnv>, s: SessionContext, pa
  * (with the pseudonymous user id) to meet accounting / dispute retention obligations.
  * See docs/PRIVACY_AND_DATA_RETENTION.md.
  */
-export async function anonymizeUser(env: Env, userId: string, actorUserId: string, actorType: "admin" | "customer") {
+export async function anonymizeUser(env: Env, userId: string, actorUserId: string, actorType: "admin" | "customer", reason = "customer_request") {
   const db = env.DB;
   const now = nowIso();
   await db.batch([
@@ -189,6 +189,6 @@ export async function anonymizeUser(env: Env, userId: string, actorUserId: strin
     db
       .prepare("UPDATE licenses SET status = 'revoked', key_hash = NULL, version = version + 1, last_op_id = ?, updated_at = ? WHERE user_id = ? AND status <> 'revoked'")
       .bind(crypto.randomUUID(), now, userId),
-    auditStatement(db, { actorUserId, actorType, targetUserId: userId, eventType: "user.deleted" }, now),
+    auditStatement(db, { actorUserId, actorType, targetUserId: userId, eventType: "user.deleted", details: { reason } }, now),
   ]);
 }

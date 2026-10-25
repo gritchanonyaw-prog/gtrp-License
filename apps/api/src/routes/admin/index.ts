@@ -51,8 +51,8 @@ export const adminRoutes = new Hono<AppEnv>()
     const b = c.req.valid("json");
     return c.json(await admin.setCustomerStatus(c.env, c.req.valid("param").id, b.status, b.reason, actor(c)));
   })
-  .post("/customers/:id/delete", validate("param", idParam), async (c) => {
-    await admin.deleteCustomer(c.env, c.req.valid("param").id, actor(c));
+  .post("/customers/:id/delete", validate("param", idParam), validate("json", adminLicenseActionInput), async (c) => {
+    await admin.deleteCustomer(c.env, c.req.valid("param").id, c.req.valid("json").reason, actor(c));
     return c.body(null, 204);
   })
 

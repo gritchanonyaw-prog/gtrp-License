@@ -90,11 +90,11 @@ export async function setCustomerStatus(env: Env, userId: string, status: "activ
   return { id: user.id, status };
 }
 
-export async function deleteCustomer(env: Env, userId: string, actor: Actor) {
+export async function deleteCustomer(env: Env, userId: string, reason: string, actor: Actor) {
   const user = await findUserById(env.DB, userId);
   if (!user || user.role !== "customer") throw errors.notFound("Customer");
   if (user.status === "deleted") return;
-  await anonymizeUser(env, userId, actor.userId!, "admin");
+  await anonymizeUser(env, userId, actor.userId!, "admin", reason);
 }
 
 export async function licenseDetail(env: Env, l: Parameters<typeof toLicenseSummary>[0]) {
